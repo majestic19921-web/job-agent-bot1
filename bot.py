@@ -29,20 +29,19 @@ KEYWORDS = [
 def scrape_iqjscout():
     url = "https://iqjscout.com/"
     res = requests.get(url)
-    soup = BeautifulSoup(res.text, "html.parser")
+    text = res.text.lower()
 
     jobs = []
 
-    for item in soup.find_all("h3"):
-        title = item.text.strip()
+    # split into chunks to catch job cards
+    chunks = text.split("job")
 
-        # try to find nearby text (city usually in same block)
-        parent_text = item.find_parent().text.lower()
-
-        jobs.append({
-            "title": title,
-            "raw": parent_text
-        })
+    for chunk in chunks:
+        if "position" in chunk or "crm" in chunk or "manager" in chunk:
+            jobs.append({
+                "title": "Possible Job Found",
+                "raw": chunk
+            })
 
     return jobs
 
